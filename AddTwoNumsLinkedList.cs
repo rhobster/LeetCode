@@ -9,37 +9,50 @@
  *     }
  * }
  */
-public class Solution {
-    public ListNode AddTwoNumbers(ListNode l1, ListNode l2) {
-        var x = BuildReverseNumber(l1) + BuildReverseNumber(l2);
-        var l = new ListNode();
-        var current = l;
-        string reversed = new string(x.ToString().Reverse().ToArray());
-        for(int i = 0; i < reversed.Count(); i++){
-            current.val = (int)Char.GetNumericValue(reversed[i]);
-            if(reversed.Count() - i > 1){
-                current.next = new ListNode();
-                current = current.next;
-            }
-        }
-        return l;
-    }
 
-    private int BuildReverseNumber(ListNode l){
-        ListNode currentNode = l;
-        Stack<int> numbers = new Stack<int>();
-        numbers.Push(currentNode.val);
-        while(currentNode.next != null){
-            currentNode = currentNode.next;
-            numbers.Push(currentNode.val);
+ //problem with uint not being big enough. but honestly it feels good.
+public class Solution {
+
+    public ListNode AddTwoNumbers(ListNode l, ListNode l2) {
+
+        var s = GetReversedString(l);
+        var s2 = GetReversedString(l2);
+
+        var sumStr = (Convert.ToUInt64(s) + Convert.ToUInt64(s2)).ToString();
+        Console.WriteLine(sumStr);
+        ListNode result = new ListNode();
+
+        
+        result.val = (int)Char.GetNumericValue(sumStr[sumStr.Length - 1]);
+        sumStr = sumStr.Remove(sumStr.Length - 1, 1);
+        //go through string backwards
+
+        ListNode worker = result;
+        for(int i = sumStr.Length-1; i >= 0; i--){
+            //make new connection
+            worker.next = new ListNode();
+            worker = worker.next;
+            worker.val = (int)Char.GetNumericValue(sumStr[i]);
         }
-        int multiplier = 1;
-        int finalNum = 0;
-        while(numbers.Count > 0){
-            int x = numbers.Pop();
-            finalNum += (x * multiplier);
-            multiplier *= 10;
+
+        return result;
+    }
+    
+
+    private string GetReversedString(ListNode listNode){
+        var worker = listNode;
+        
+        //use a stack
+        var stack = new Stack<string>();
+        while(worker.next != null){
+            stack.Push(worker.val.ToString());
+            worker = worker.next;
         }
-        return finalNum;
+        stack.Push(worker.val.ToString());
+        string s = stack.Pop();
+        while(stack.Count > 0){
+            s += stack.Pop();
+        }
+        return s;
     }
 }
